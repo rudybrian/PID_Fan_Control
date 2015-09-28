@@ -18,8 +18,9 @@ import pid as pid
 from time import sleep
 
 PIN_TO_PWM = 202       		# PiFace output 3
-TEMP_SET_POINT = 40.0  		# Temperature setpoint in Celsius
+TEMP_SET_POINT = 45.0  		# Temperature setpoint in Celsius
 INVERT_DUTY_CYCLE = False	# Set to "True" if using a four wire (PWM) fan with open collector outputs (i.e. PiFace)
+MIN_FAN_SPEED = 0		# Some fans don't work properly if you decrease the duty cycle below a certain value. 
 
 def get_temperature():
 	# Returns the temperature in degrees Celsius
@@ -56,6 +57,10 @@ try:
 			cycle = 0
 		elif (cycle > 100):
 			cycle = 100
+
+		if (cycle < MIN_FAN_SPEED):
+			cycle = MIN_FAN_SPEED
+
 		print 'Setpoint: ' +str(TEMP_SET_POINT)+ '\nTemp: ' +str(get_temperature())+ '\nFan Speed: ',str(cycle)+'%'
 		if INVERT_DUTY_CYCLE:
 			wiringpi2.softPwmWrite(PIN_TO_PWM,100 - cycle) # Change PWM duty cycle
