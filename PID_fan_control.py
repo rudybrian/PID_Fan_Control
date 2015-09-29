@@ -20,7 +20,7 @@ from time import sleep
 PIN_TO_PWM = 202       		# PiFace output 3
 TEMP_SET_POINT = 45.0  		# Temperature setpoint in Celsius
 INVERT_DUTY_CYCLE = False	# Set to "True" if using a four wire (PWM) fan with open collector outputs (i.e. PiFace)
-MIN_FAN_SPEED = 85		# Some fans don't work properly if you decrease the duty cycle below a certain value. 
+MIN_FAN_SPEED = 0		# Some fans don't work properly if you decrease the duty cycle below a certain value. 
 MIN_FAN_TURN_OFF = False	# When using MIN_FAN_SPEED, allow the fan to turn off when duty cycle is 0.
 
 def get_temperature():
