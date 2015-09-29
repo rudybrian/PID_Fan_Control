@@ -14,7 +14,7 @@ This code is only a proof of concept and would need to be modified to some degre
 ## Configuration
 The three adjustable parameters are:
 * PIN_TO_PWM: This parameter is the GPIO pin to use for PWM. Default is 202 (PiFace output #3)
-* TEMP_SET_POINT: This is the target temperature in Celsius. Default is 40.0
+* TEMP_SET_POINT: This is the target temperature in Celsius. Default is 45.0
 * INVERT_DUTY_CYCLE: This parameter is used to invert the duty cycle which is needed if using open collector outputs (like the PiFace) to drive a four wire (PWM) fan. Default is False.
 * MIN_FAN_SPEED: This parameter is used to set the minimum duty cycle. Some fans do not spin with the duty cycle below certain values, and this allows setting a minimum value to avoid this. Default is 0.
-
+* MIN_FAN_TURN_OFF: This parameter works in conjunction with MIN_FAN_SPEED to turn off the fan when the target duty cycle reaches 0. Default is False.
