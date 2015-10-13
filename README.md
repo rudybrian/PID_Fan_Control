@@ -28,3 +28,16 @@ The adjustable parameters are:
 * -v, --verbose
 	Verbose logging. When enabled, this parameter instructs the program to log additional details during run time which can be helpful when setting up new fans, or tuning parameters. Default is False.
 
+## Installation
+FPP users: to make the script run as a daemon, follow the instructions below.
+* Upload the two python (.py) files to your FPP scripts directory (/home/fpp/media/scripts)
+* Upload the init script (.sh) to your uploads directory.
+* SSH in to your FPP.
+* Manually run the PID_fan_control.py script to ensure it works properly, and add/adjust any configurable parameters via command line options. It may be helpful to enable verbose logging (--verbose) to see more details while running. You can view the logs in the FPP log directory under the name PID_fan_control.log.
+* Only once you are satisfied with the settings, continue to the next step.
+* Copy the init script to your init.d directory with 'sudo cp /home/fpp/media/uploads/PID_fan_control.sh /etc/init.d'.
+* Make the init script executable with 'sudo chmod 755 /etc/init.d/PID_fan_control.sh'
+* Edit the init script and add any desired command line arguments to DAEMON_OPTS. e.g. 'DAEMON_OPTS="--min_speed 85 --min_turn off"'
+* Verify that the script is working by running the following 'sudo /etc/init.d/PID_fan_control.sh start', then 'sudo /etc/init.d/PID_fan_control.sh status' this should show that the program is running. Also, confirm it is using the desired settings by looking at the most recent log entry in PID_fan_control.log in your FPP Logs.
+* Once you are happy with how things are working, run 'sudo update-rc.d PID_fan_control.sh defaults' This will add the symbolic links to your rc directories and make the program automatically start/stop at the appropriate times.
+
