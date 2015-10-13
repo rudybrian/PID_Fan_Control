@@ -6,15 +6,24 @@
 # 
 # Simple PID loop to control fan speed. 
 #
-# Originally based on pidfanpi: https://github.com/SimplyAutomationized/raspberrypi/tree/master/pidfanpi
 #
-## Release History
-# v0.01 09/14/2015 Brian Rudy (brudyNO@SPAMpraecogito.com)
-#	First working version. Only supports the Raspberry Pi and PiFace board. Uses the GPU temperature for reference.
+# Copyright (C) 2015 Brian Rudy (Setarcos)
+#
+# PID_fan_control is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2 of
+# the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, see <http://www.gnu.org/licenses/>.
 #
 
 import subprocess
-import os
 import logging
 import logging.handlers
 import argparse
@@ -30,8 +39,8 @@ INVERT_DUTY_CYCLE = False	# Set to "True" if using a four wire (PWM) fan with op
 MIN_FAN_SPEED = 0		# Some fans don't work properly if you decrease the duty cycle below a certain value. 
 MIN_FAN_TURN_OFF = False	# When using MIN_FAN_SPEED, allow the fan to turn off when duty cycle is 0.
 LOG_FILENAME = "/home/fpp/media/logs/pid_fan_control.log"	# Default log file location
-LOG_LEVEL = logging.INFO	# Default INFO level logging
-VERBOSE_LOGGING = False
+LOG_LEVEL = logging.INFO	# Default INFO level logging (could also be DEBUG or WARNING)
+VERBOSE_LOGGING = False		# Log additional details to aid in initial setup/debugging
 
 # Define the command line arguments
 parser = argparse.ArgumentParser(description="Simple PID loop to control fan speed")
@@ -127,32 +136,27 @@ print '->MIN_FAN_TURN_OFF=' +str(MIN_FAN_TURN_OFF)
 print '->LOG_FILENAME=' + LOG_FILENAME 
 print '->LOG_LEVEL=' +str(LOG_LEVEL)
 
-try:
-	while True:
-		sleep(1)
-		x = (p.update(get_temperature()))*-1
-		#print x
-		cycle = 100 + int(x)
-		if (cycle < 0):
-			cycle = 0
-		elif (cycle > 100):
-			cycle = 100
+while True:
+	sleep(1)
+	x = (p.update(get_temperature()))*-1
+	#print x
+	cycle = 100 + int(x)
+	if (cycle < 0):
+		cycle = 0
+	elif (cycle > 100):
+		cycle = 100
 
-		if (MIN_FAN_TURN_OFF and cycle == 0):
-			cycle = 0
-		elif (cycle < MIN_FAN_SPEED):
-			cycle = MIN_FAN_SPEED
+	if (MIN_FAN_TURN_OFF and cycle == 0):
+		cycle = 0
+	elif (cycle < MIN_FAN_SPEED):
+		cycle = MIN_FAN_SPEED
 
-		# Only print something when the duty cycle changes
-		if (last_duty_cycle != cycle and VERBOSE_LOGGING):
-			print 'Setpoint: ' +str(TEMP_SET_POINT)+ ', Temp: ' +str(get_temperature())+ ', Fan Speed: ',str(cycle)+'%'
-			last_duty_cycle = cycle
-		if INVERT_DUTY_CYCLE:
-			wiringpi2.softPwmWrite(PIN_TO_PWM,100 - cycle) # Change PWM duty cycle
-		else:
-			wiringpi2.softPwmWrite(PIN_TO_PWM,cycle) # Change PWM duty cycle
-except KeyboardInterrupt:
-	wiringpi2.softPwmWrite(PIN_TO_PWM,0) # Change PWM duty cycle to 0 (off)
-	pass
-
+	# Only print something when the duty cycle changes
+	if (last_duty_cycle != cycle and VERBOSE_LOGGING):
+		print 'Setpoint: ' +str(TEMP_SET_POINT)+ ', Temp: ' +str(get_temperature())+ ', Fan Speed: ',str(cycle)+'%'
+		last_duty_cycle = cycle
+	if INVERT_DUTY_CYCLE:
+		wiringpi2.softPwmWrite(PIN_TO_PWM,100 - cycle) # Change PWM duty cycle
+	else:
+		wiringpi2.softPwmWrite(PIN_TO_PWM,cycle) # Change PWM duty cycle
 
