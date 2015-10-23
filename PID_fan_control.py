@@ -41,6 +41,7 @@ MIN_FAN_TURN_OFF = False	# When using MIN_FAN_SPEED, allow the fan to turn off w
 LOG_FILENAME = "/home/fpp/media/logs/pid_fan_control.log"	# Default log file location
 LOG_LEVEL = logging.INFO	# Default INFO level logging (could also be DEBUG or WARNING)
 VERBOSE_LOGGING = False		# Log additional details to aid in initial setup/debugging
+VERBOSE_TEMP_THRESHOLD = 1.0	# With Verbose logging enabled, print to the log when the temperature changes (+-) by this amount even if the fan speed remains the same
 
 # Define the command line arguments
 parser = argparse.ArgumentParser(description="Simple PID loop to control fan speed")
@@ -51,6 +52,7 @@ parser.add_argument("-i", "--invert", help="Invert duty cycle (default '" + str(
 parser.add_argument("-m", "--min_speed", help="Minimum fan duty cycle (default '" + str(MIN_FAN_SPEED) + "')")
 parser.add_argument("-o", "--min_turn_off", help="When using --min_speed with a value >0, set to True to turn off the fan when the target speed is 0 --min_speed (default '" + str(MIN_FAN_TURN_OFF) + "')", action="store_true")
 parser.add_argument("-v", "--verbose", help="Verbose logging (default '" + str(VERBOSE_LOGGING) + "')", action="store_true")
+parser.add_argument("-T", "--verbose_temp_threshold", help="Verbose temperature threshold (default '" + str(VERBOSE_TEMP_THRESHOLD) + "')")
 
 # parse the command line arguments
 args = parser.parse_args()
@@ -66,6 +68,9 @@ if args.min_speed:
 INVERT_DUTY_CYCLE = args.invert
 MIN_FAN_TURN_OFF = args.min_turn_off
 VERBOSE_LOGGING = args.verbose
+
+if (args.verbose_temp_threshold and args.verbose):
+	VERBOSE_TEMP_THRESHOLD = float(args.verbose_temp_threshold)
 
 # Set a unique name
 logger = logging.getLogger(__name__)
@@ -124,6 +129,7 @@ if VERBOSE_LOGGING:
 	print "Result from softPwmCreate(PIN_TO_PWM, cycle, 100): {}".format(str(pwm))
 
 last_duty_cycle = 0
+last_temp = 0
 
 print 'Starting main loop with the following settings:'
 
@@ -135,10 +141,12 @@ print '->MIN_FAN_SPEED=' +str(MIN_FAN_SPEED)
 print '->MIN_FAN_TURN_OFF=' +str(MIN_FAN_TURN_OFF)
 print '->LOG_FILENAME=' + LOG_FILENAME 
 print '->LOG_LEVEL=' +str(LOG_LEVEL)
+print '->VERBOSE_TEMP_THRESHOLD=' +str(VERBOSE_TEMP_THRESHOLD)
 
 while True:
 	sleep(1)
-	x = (p.update(get_temperature()))*-1
+	temp = get_temperature()
+	x = (p.update(temp))*-1
 	#print x
 	cycle = 100 + int(x)
 	if (cycle < 0):
@@ -152,9 +160,10 @@ while True:
 		cycle = MIN_FAN_SPEED
 
 	# Only print something when the duty cycle changes
-	if (last_duty_cycle != cycle and VERBOSE_LOGGING):
-		print 'Setpoint: ' +str(TEMP_SET_POINT)+ ', Temp: ' +str(get_temperature())+ ', Fan Speed: ',str(cycle)+'%'
+	if ((last_duty_cycle != cycle and VERBOSE_LOGGING) or ((temp >= VERBOSE_TEMP_THRESHOLD + last_temp) and VERBOSE_LOGGING) or ((temp <= last_temp - VERBOSE_TEMP_THRESHOLD) and VERBOSE_LOGGING)):
+		print 'Setpoint: ' +str(TEMP_SET_POINT)+ ', Temp: ' +str(temp)+ ', Fan Speed: ',str(cycle)+'%'
 		last_duty_cycle = cycle
+		last_temp = temp
 	if INVERT_DUTY_CYCLE:
 		wiringpi2.softPwmWrite(PIN_TO_PWM,100 - cycle) # Change PWM duty cycle
 	else:

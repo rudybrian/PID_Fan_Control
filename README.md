@@ -25,6 +25,8 @@ The adjustable parameters are:
 	This parameter works in conjunction with MIN_FAN_SPEED to turn off the fan when the target duty cycle reaches 0. Default is False.
 * -v, --verbose
 	Verbose logging. When enabled, this parameter instructs the program to log additional details during run time which can be helpful when setting up new fans, or tuning parameters. Default is False.
+* -T VERBOSE_TEMP_THRESHOLD, --verbose_temp_threshold VERBOSE_TEMP_THRESHOLD
+	When using verbose logging, the amount the temperature must change (+-) to write to the logfile if the duty cycle has not changed. This can be helpful if using the logs to monitor the fan/temperature performance. Default is 1.0
 
 ## Installation
 FPP users: to make the script run as a daemon, follow the instructions below.
