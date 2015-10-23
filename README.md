@@ -31,7 +31,7 @@ The adjustable parameters are:
 ## Installation
 FPP users: to make the script run as a daemon, follow the instructions below.
   1. Upload the two python (.py) files to your FPP scripts directory (/home/fpp/media/scripts)
-  2. Upload the init script (.sh) to your uploads directory.
+  2. Upload the init script (PID_fan_control.sh) to your uploads directory.
   3. SSH in to your FPP.
     1. Manually run the PID_fan_control.py script to ensure it works properly, and add/adjust any configurable parameters via command line options. It may be helpful to enable verbose logging (--verbose) to see more details while running. You can view the logs in the FPP log directory under the name PID_fan_control.log.
     2. Only once you are satisfied with the settings, continue to the next step.
@@ -41,6 +41,18 @@ FPP users: to make the script run as a daemon, follow the instructions below.
     6. Verify that the script is working by running the following `sudo /etc/init.d/PID_fan_control.sh start`, then `sudo /etc/init.d/PID_fan_control.sh status` this should show that the program is running. Also, confirm it is using the desired settings by looking at the most recent log entry in PID_fan_control.log in your FPP Logs.
     7. Once you are happy with how things are working, run `sudo update-rc.d PID_fan_control.sh defaults` This will add the symbolic links to your rc directories and make the program automatically start/stop at the appropriate times.
     8. Reboot FPP and ensure the daemon is running by checking the latest log entry, and confirming the `python /home/fpp/media/scripts/PID_fan_control.py` process is running from the FPP Troubleshooting Commands in the Processes section.
+### Optional Installation to support SNMP monitoring
+  1. Upload the Perl script (read_fan_stats.pl) to your FPP scripts directory (/home/fpp/media/scripts)
+  2. While logged in via SSH, install the snmp and snmpd packages with `sudo apt-get install snmpd snmp`.
+  3. Use your favorite text editor to modify agentAddress in /etc/snmp/snmpd.conf from `agentAddress udp:127.0.0.1:161` to `AgentAddress 161`
+  4. Set the read-only snmp community string to public by adding `rocommunity public` below the `#rocommunity public localhost` line.
+  5. Add the following line towards the bottom of the file: `extend pidfan1	/usr/bin/perl /home/fpp/media/scripts/read_fan_stats.pl /home/fpp/media/logs/pid_fan_control.log`
+  6. Restart the snmpd daemon with `sudo service snmpd restart`
+  7. The temperature setpoint, current temperature and fan speed are now available on the following OIDs:
+    temperature setpoint: .1.3.6.1.4.1.8072.1.3.2.4.1.2.7.112.105.100.102.97.110.49.1
+    current temperature: .1.3.6.1.4.1.8072.1.3.2.4.1.2.7.112.105.100.102.97.110.49.2
+    fan duty cycle: .1.3.6.1.4.1.8072.1.3.2.4.1.2.7.112.105.100.102.97.110.49.3
+
 
 ## References
 * This application was initially based on pidfanpi: https://github.com/SimplyAutomationized/raspberrypi/tree/master/pidfanpi
