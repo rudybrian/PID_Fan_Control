@@ -119,7 +119,7 @@ p.setPoint(TEMP_SET_POINT)
 cycle = 100 # Set the initial fan duty cycle to 100%
 
 # Setup the PiFace PWM
-wiringpi2.wiringPiSetupSys()
+#wiringpi2.wiringPiSetupSys()
 result = wiringpi2.piFaceSetup(200) # Must use the base address of the PiFace
 if VERBOSE_LOGGING:
 	print "Result from piFaceSetup(200): {}".format(str(result))
@@ -162,10 +162,11 @@ while True:
 	# Only print something when the duty cycle changes
 	if ((last_duty_cycle != cycle and VERBOSE_LOGGING) or ((temp >= VERBOSE_TEMP_THRESHOLD + last_temp) and VERBOSE_LOGGING) or ((temp <= last_temp - VERBOSE_TEMP_THRESHOLD) and VERBOSE_LOGGING)):
 		print 'Setpoint: ' +str(TEMP_SET_POINT)+ ', Temp: ' +str(temp)+ ', Fan Speed: ',str(cycle)+'%'
-		last_duty_cycle = cycle
 		last_temp = temp
-	if INVERT_DUTY_CYCLE:
+	if (INVERT_DUTY_CYCLE and last_duty_cycle != cycle):
 		wiringpi2.softPwmWrite(PIN_TO_PWM,100 - cycle) # Change PWM duty cycle
-	else:
+	elif (last_duty_cycle != cycle):
 		wiringpi2.softPwmWrite(PIN_TO_PWM,cycle) # Change PWM duty cycle
+
+	last_duty_cycle = cycle
 
