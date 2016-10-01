@@ -1,8 +1,8 @@
 # PID_Fan_Control
-Automatic temperature control for fans attached to a Raspberry Pi running `FPP <https://github.com/FalconChristmas/fpp>`
+Automatic temperature control for fans attached to a Raspberry Pi running [FPP](https://github.com/FalconChristmas/fpp>)
 
 ## Notes
-* A stand-alone version of PID_Fan_Control (not dependent on FPP) can be found in the `stand-alone branch <https://github.com/rudybrian/PID_Fan_Control/tree/stand-alone>`
+* A stand-alone version of PID_Fan_Control (not dependent on FPP) can be found in the [stand-alone branch](https://github.com/rudybrian/PID_Fan_Control/tree/stand-alone>)
 * `The Wikipedia article on PID controllers <https://en.wikipedia.org/wiki/PID_controller>`
 * The temperature is actually coming from the GPU, but the GPU and CPU temps should be roughly the same
 * The PiFace ULN2803A is only capable of driving 500mA max on each output, so if you need to drive a high power fan, appropriate drive circuitry must be added to the output 
