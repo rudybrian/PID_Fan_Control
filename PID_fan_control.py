@@ -7,7 +7,7 @@
 # Simple PID loop to control fan speed. 
 #
 #
-# Copyright (C) 2015 Brian Rudy (Setarcos)
+# Copyright (C) 2015-2016 Brian Rudy (Setarcos)
 #
 # PID_fan_control is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License
@@ -28,7 +28,6 @@ import logging
 import logging.handlers
 import argparse
 import sys
-import wiringpi2
 import pid as pid
 from time import sleep
 
@@ -42,6 +41,7 @@ LOG_FILENAME = "/home/fpp/media/logs/pid_fan_control.log"	# Default log file loc
 LOG_LEVEL = logging.INFO	# Default INFO level logging (could also be DEBUG or WARNING)
 VERBOSE_LOGGING = False		# Log additional details to aid in initial setup/debugging
 VERBOSE_TEMP_THRESHOLD = 1.0	# With Verbose logging enabled, print to the log when the temperature changes (+-) by this amount even if the fan speed remains the same
+FPP_BINARY_PATH = "/opt/fpp/bin.pi/"	# The path to the fpp binary
 
 # Define the command line arguments
 parser = argparse.ArgumentParser(description="Simple PID loop to control fan speed")
@@ -112,21 +112,38 @@ def get_temperature():
 		print 'Unable to run vcgencmd!'
 		return 0
 
+def setup_softpwm():
+	# Sets up softPWM on the given GPIO
+	try:
+		s = subprocess.check_output([str(FPP_BINARY_PATH) + 'fpp', '-G', str(PIN_TO_PWM) + ',SoftPWM'])
+		return s
+	except:
+		print 'Unable to setup SoftPWM!'
+		return 0
+
+def set_softpwm(cycle):
+	# Updates softPWM duty cycle value on the given GPIO
+	try:
+		s = subprocess.check_output([str(FPP_BINARY_PATH) + 'fpp', '-g', str(PIN_TO_PWM) + ',SoftPWM,' + str(cycle)])
+		return s
+	except:
+		print 'Unable to update SoftPWM!'
+		return 0
+
 
 # Main routine starts here
 p = pid.PID(1,1,0.02, Integrator_max=100, Integrator_min=0)
 p.setPoint(TEMP_SET_POINT)
 cycle = 100 # Set the initial fan duty cycle to 100%
 
-# Setup the PiFace PWM
-#wiringpi2.wiringPiSetupSys()
-result = wiringpi2.piFaceSetup(200) # Must use the base address of the PiFace
+# Setup the SoftPWM
+result = setup_softpwm() 
 if VERBOSE_LOGGING:
-	print "Result from piFaceSetup(200): {}".format(str(result))
+	print "Result from setup_softpwm(): {}".format(str(result))
 
-pwm = wiringpi2.softPwmCreate(PIN_TO_PWM,cycle,100) # Setup PWM using Pin, Initial Value and Range parameters
+pwm = set_softpwm(100) # Set initial PWM value
 if VERBOSE_LOGGING:
-	print "Result from softPwmCreate(PIN_TO_PWM, cycle, 100): {}".format(str(pwm))
+	print "Result from set_softpwm(100): {}".format(str(pwm))
 
 last_duty_cycle = 0
 last_temp = 0
@@ -164,9 +181,9 @@ while True:
 		print 'Setpoint: ' +str(TEMP_SET_POINT)+ ', Temp: ' +str(temp)+ ', Fan Speed: ',str(cycle)+'%'
 		last_temp = temp
 	if (INVERT_DUTY_CYCLE and last_duty_cycle != cycle):
-		wiringpi2.softPwmWrite(PIN_TO_PWM,100 - cycle) # Change PWM duty cycle
+		set_softpwm(100 - cycle) # Change PWM duty cycle
 	elif (last_duty_cycle != cycle):
-		wiringpi2.softPwmWrite(PIN_TO_PWM,cycle) # Change PWM duty cycle
+		set_softpwm(cycle) # Change PWM duty cycle 
 
 	last_duty_cycle = cycle
 
