@@ -38,8 +38,8 @@ FPP users: to make the script run as a daemon, follow the instructions below.
     3. Make the init script executable with 'sudo chmod 755 /etc/init.d/PID_fan_control.sh'
     4. Edit the init script and add any desired command line arguments to DAEMON_OPTS. e.g. `DAEMON_OPTS="--min_speed 85 --min_turn_off"`
     5. Add the PID_fan_control.sh script as a preset for `FPPD_STARTED` with script arguments `start` and test (check PID_fan_control.log)
-	6. Add the PID_fan_control.sh script as a preset for `FPPD_STOPPED` with script arguments `stop` and test (check PID_fan_control.log)
-    8. Restart fppd and ensure the daemon is running by checking the latest log entries.
+    6. Add the PID_fan_control.sh script as a preset for `FPPD_STOPPED` with script arguments `stop` and test (check PID_fan_control.log)
+    7. Restart fppd and ensure the daemon is running by checking the latest log entries.
 
 ### Optional Installation to support SNMP monitoring
   1. Upload the Perl script (read_fan_stats.pl) to your FPP scripts directory (/home/fpp/media/scripts)
