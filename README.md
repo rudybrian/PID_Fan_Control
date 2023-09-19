@@ -22,6 +22,8 @@ The adjustable parameters are:
 	This parameter is used to set the minimum duty cycle. Some fans do not spin with the duty cycle below certain values, and this allows setting a minimum value to avoid this. Default is 0.
 * -o, --min_turn_off
 	This parameter works in conjunction with MIN_FAN_SPEED to turn off the fan when the target duty cycle reaches 0. Default is False.
+* -d, --on_off
+	Set to True to use dumb mode i.e. on or off when PWM is not supported by the selected GPIO. Default is False.
 * -v, --verbose
 	Verbose logging. When enabled, this parameter instructs the program to log additional details during run time which can be helpful when setting up new fans, or tuning parameters. Default is False.
 * -T VERBOSE_TEMP_THRESHOLD, --verbose_temp_threshold VERBOSE_TEMP_THRESHOLD
@@ -29,17 +31,15 @@ The adjustable parameters are:
 
 ## Installation
 FPP users: to make the script run as a daemon, follow the instructions below.
-  1. Upload the two python (.py) files to your FPP scripts directory (/home/fpp/media/scripts)
-  2. Upload the init script (PID_fan_control.sh) to your uploads directory.
-  3. SSH in to your FPP.
+  1. Upload the two python (.py) files and the init script (PID_fan_control.sh) to your FPP scripts directory (/home/fpp/media/scripts)
+  2. SSH in to your FPP.
     1. Manually run the PID_fan_control.py script to ensure it works properly, and add/adjust any configurable parameters via command line options. It may be helpful to enable verbose logging (--verbose) to see more details while running. You can view the logs in the FPP log directory under the name PID_fan_control.log.
     2. Only once you are satisfied with the settings, continue to the next step.
-    3. Copy the init script to your init.d directory with `sudo cp /home/fpp/media/uploads/PID_fan_control.sh /etc/init.d`.
-    4. Make the init script executable with 'sudo chmod 755 /etc/init.d/PID_fan_control.sh'
-    5. Edit the init script and add any desired command line arguments to DAEMON_OPTS. e.g. `DAEMON_OPTS="--min_speed 85 --min_turn_off"`
-    6. Verify that the script is working by running the following `sudo /etc/init.d/PID_fan_control.sh start`, then `sudo /etc/init.d/PID_fan_control.sh status` this should show that the program is running. Also, confirm it is using the desired settings by looking at the most recent log entry in PID_fan_control.log in your FPP Logs.
-    7. Once you are happy with how things are working, run `sudo update-rc.d PID_fan_control.sh defaults` This will add the symbolic links to your rc directories and make the program automatically start/stop at the appropriate times.
-    8. Reboot FPP and ensure the daemon is running by checking the latest log entry, and confirming the `python /home/fpp/media/scripts/PID_fan_control.py` process is running from the FPP Troubleshooting Commands in the Processes section.
+    3. Make the init script executable with 'sudo chmod 755 /etc/init.d/PID_fan_control.sh'
+    4. Edit the init script and add any desired command line arguments to DAEMON_OPTS. e.g. `DAEMON_OPTS="--min_speed 85 --min_turn_off"`
+    5. Add the PID_fan_control.sh script as a preset for `FPPD_STARTED` with script arguments `start` and test (check PID_fan_control.log)
+	6. Add the PID_fan_control.sh script as a preset for `FPPD_STOPPED` with script arguments `stop` and test (check PID_fan_control.log)
+    8. Restart fppd and ensure the daemon is running by checking the latest log entries.
 
 ### Optional Installation to support SNMP monitoring
   1. Upload the Perl script (read_fan_stats.pl) to your FPP scripts directory (/home/fpp/media/scripts)
