@@ -16,7 +16,9 @@ DAEMON=$DIR/PID_fan_control.py
 DAEMON_NAME=PID_fan_control
 
 # Add any command line options for your daemon here
-DAEMON_OPTS="--min_turn_off --min_speed 85"
+#DAEMON_OPTS="--min_turn_off --min_speed 85"
+#DAEMON_OPTS="--min_turn_off --min_speed 85 --verbose --verbose_temp_threshold 0.1"
+DAEMON_OPTS="--min_turn_off --min_speed 0 --on_off --verbose --verbose_temp_threshold 0.1"
 
 # This next line determines what user the script runs as.
 # Root generally not recommended but necessary if you are using the Raspberry Pi GPIO from Python.
