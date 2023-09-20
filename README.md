@@ -49,9 +49,9 @@ FPP users: to make the script run as a daemon, follow the instructions below.
   5. Add the following line towards the bottom of the file: `extend pidfan1	/usr/bin/perl /home/fpp/media/scripts/read_fan_stats.pl /home/fpp/media/logs/pid_fan_control.log`
   6. Restart the snmpd daemon with `sudo service snmpd restart`
   7. The temperature setpoint, current temperature and fan speed are now available on the following OIDs:
-    * temperature setpoint: .1.3.6.1.4.1.8072.1.3.2.4.1.2.7.112.105.100.102.97.110.49.1
-    * current temperature: .1.3.6.1.4.1.8072.1.3.2.4.1.2.7.112.105.100.102.97.110.49.2
-    * fan duty cycle: .1.3.6.1.4.1.8072.1.3.2.4.1.2.7.112.105.100.102.97.110.49.3
+   * temperature setpoint: .1.3.6.1.4.1.8072.1.3.2.4.1.2.7.112.105.100.102.97.110.49.1
+   * current temperature: .1.3.6.1.4.1.8072.1.3.2.4.1.2.7.112.105.100.102.97.110.49.2
+   * fan duty cycle: .1.3.6.1.4.1.8072.1.3.2.4.1.2.7.112.105.100.102.97.110.49.3
 
 
 ## References
